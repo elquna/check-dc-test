@@ -19,7 +19,7 @@ class CreateUsersubscriptionplansTable extends Migration
             $table->integer('user_id')->default(0);
             $table->integer('subscriptionplan_id')->comment('id from subscriptionplans table');
             $table->date('start_date');
-            $table->date('end_date');
+            $table->date('end_date')->nullable();
             $table->string('status')->default('active')->comment('active or inactive');
         });
     }

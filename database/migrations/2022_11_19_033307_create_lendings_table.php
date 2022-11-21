@@ -22,7 +22,7 @@ class CreateLendingsTable extends Migration
             $table->dateTime('datetime_returned', $precision = 0)->nullable();
             $table->dateTime('datetime_due', $precision = 0)->nullable();
             $table->integer('points')->default(0)->comment('will be updated after book is returned');
-            $table->integer('status')->default(0)->comment('0 for pending return, 1 for returned');
+            $table->integer('status')->default('active')->comment('active or inactive');
             $table->integer('subscriptionplan_id')->comment('the subscription plan the book falls into');
         });
     }

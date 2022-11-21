@@ -38,6 +38,10 @@ Route::middleware('auth:sanctum')->group( function () {
   Route::post('assign_subscription_plan_to_book', [AdminController::class,  'assign_subscription_plan_to_book']);
 
   //general routes
-  Route::post('subscribe_to_a_plan', [AdminController::class,  'subscribe_to_a_plan']);
+  Route::post('subscribe_to_a_plan', [UserController::class,  'subscribe_to_a_plan']);
+  Route::get('get_active_subscription', [UserController::class,  'get_active_subscription']);
+  Route::get('view_inactive_subscriptions', [UserController::class,  'view_inactive_subscriptions']);
+  Route::post('borrow_book', [UserController::class,  'borrow_book']);
+  Route::post('return_book', [UserController::class,  'return_book']);
 
 });
