@@ -34,8 +34,10 @@ Route::middleware('auth:sanctum')->group( function () {
   Route::get('viewbooks', [AdminController::class, 'viewbooks']);
   Route::get('getbookbyid/{id}', [AdminController::class, 'getbookbyid']);
   Route::post('updatebookstatus', [AdminController::class,  'updatebookstatus']);
-  Route::post('assignauthortobook', [AdminController::class,  'assignauthortobook']);
+  Route::post('assign_author_to_book', [AdminController::class,  'assign_author_tobook']);
+  Route::post('assign_subscription_plan_to_book', [AdminController::class,  'assign_subscription_plan_to_book']);
 
-
+  //general routes
+  Route::post('subscribe_to_a_plan', [AdminController::class,  'subscribe_to_a_plan']);
 
 });

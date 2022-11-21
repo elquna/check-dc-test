@@ -4,12 +4,13 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Userrole;
 use App\Models\Book;
 use App\Models\Bookauthor;
+use App\Models\Subscriptionplan;
+use App\Models\Booksubscriptionplan;
 use Validator;
 
 
@@ -260,7 +261,7 @@ class AdminController extends Controller
     /*assign a book to an author
     * an author is a user, so the user_id in the users table will be used
     */
-    public function assignauthortobook(Request $request)
+    public function assign_author_tobook(Request $request)
     {
         $validator = Validator::make($request->all(),[
             'book_id' => 'required',
@@ -297,6 +298,47 @@ class AdminController extends Controller
         $bk->save();
         return response()->json(['status'=>'success', 'message'=>"author assigned to book successfully",  'data' =>$bk],200);
 
+
+    }
+
+
+    //assign a subscription plan . this can be done  more than once with different books
+    public function assign_subscription_plan_to_book(Request $request)
+    {
+      $validator = Validator::make($request->all(),[
+          'book_id' => 'required',
+      ]);
+      if($validator->fails()){
+      return response()->json(['status' => 'error' , 'message'=>'book_id is required' , 'data'=>''],400);
+      }
+
+
+      $validator = Validator::make($request->all(),[
+          'subscriptionplan_id' => 'required',
+      ]);
+      if($validator->fails()){
+      return response()->json(['status' => 'error' , 'message'=>'subscriptionplan_id is required' , 'data'=>''],400);
+      }
+
+      //check if user exist
+      $checksub = Subscriptionplan::where('id',$request->subscriptionplan_id)->first();
+      if($checksub == null)
+      {
+          return response()->json(['status' => 'error' , 'message'=>'subscriptionplan not found' , 'data'=>''],400);
+      }
+
+      //check if subscriptionplan exist
+      $checkbook = Book::where('id',$request->book_id)->first();
+      if($checkbook == null)
+      {
+        return response()->json(['status' => 'error' , 'message'=>'book not found' , 'data'=>''],400);
+      }
+
+      $bs = new Booksubscriptionplan();
+      $bs->subscriptionplan_id = $request->subscriptionplan_id;
+      $bs->book_id = $request->book_id;
+      $bs->save();
+      return response()->json(['status'=>'success', 'message'=>"subscription plan assigned to book successfully",  'data' =>$bs],200);
 
     }
 
