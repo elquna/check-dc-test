@@ -46,4 +46,11 @@ Route::middleware('auth:sanctum')->group( function () {
   Route::get('view_borrowed_books', [UserController::class,  'view_borrowed_books']);
   Route::get('view_returned_books', [UserController::class,  'view_returned_books']);
 
+  //author routes
+  Route::post('author/createbook', [UserController::class, 'createbook']);
+  Route::post('author/updatebook', [UserController::class, 'updatebook']);
+  Route::post('author/updatebookstatus', [UserController::class,  'updatebookstatus']);
+
+
+
 });

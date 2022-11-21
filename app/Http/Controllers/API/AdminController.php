@@ -147,6 +147,13 @@ class AdminController extends Controller
           }
 
           $validator = Validator::make($request->all(),[
+              'access_level' => 'required',
+          ]);
+          if($validator->fails()){
+          return response()->json(['status' => 'error' , 'message'=>'access_level is required' , 'data'=>''],400);
+          }
+
+          $validator = Validator::make($request->all(),[
               'title' => 'unique:books',
           ]);
           if($validator->fails()){

@@ -284,4 +284,157 @@ class UserController extends Controller
             $d = \DateTime::createFromFormat($format, $date);
             return $d && $d->format($format) == $date;
       }
+
+
+      //createbook from author end
+      public function createbook(Request $request)
+      {
+            $validator = Validator::make($request->all(),[
+                'title' => 'required',
+            ]);
+            if($validator->fails()){
+            return response()->json(['status' => 'error' , 'message'=>'title is required' , 'data'=>''],400);
+            }
+
+            $validator = Validator::make($request->all(),[
+                'title' => 'unique:books',
+            ]);
+            if($validator->fails()){
+            return response()->json(['status' => 'error' , 'message'=>'title has been taken' , 'data'=>''],400);
+            }
+
+
+            $validator = Validator::make($request->all(),[
+                'edition' => 'required',
+            ]);
+            if($validator->fails()){
+            return response()->json(['status' => 'error' , 'message'=>'edition is required' , 'data'=>''],400);
+            }
+
+            $validator = Validator::make($request->all(),[
+                'access_level' => 'required',
+            ]);
+            if($validator->fails()){
+            return response()->json(['status' => 'error' , 'message'=>'access_level is required' , 'data'=>''],400);
+            }
+
+
+            $book = new Book();
+            $book->title = $request->title;
+            $book->edition = $request->edition;
+            $book->description = $request->description;
+            $book->prologue = $request->prologue;
+            $book->access_level = $request->access_level;
+            $book->save();
+
+            $auth_user = auth()->guard('sanctum')->user();// get logged in user details from auth data
+            $user_id = $auth_user->id;
+
+            $bookauthor =  new Bookauthor();
+            $bookauthor->book_id = $book->id;
+            $bookauthor->user_id = $user_id;
+            $bookauthor->save();
+            return response()->json(['status'=>'success', 'message'=>"book added successfully",  'data' =>$book],200);
+      }
+
+
+      //update a book from author end
+      public function updatebook(Request $request)
+      {
+            $validator = Validator::make($request->all(),[
+                'book_id' => 'required',
+            ]);
+            if($validator->fails()){
+            return response()->json(['status' => 'error' , 'message'=>'id is required' , 'data'=>''],400);
+            }
+
+            $validator = Validator::make($request->all(),[
+                'title' => 'required',
+            ]);
+            if($validator->fails()){
+            return response()->json(['status' => 'error' , 'message'=>'title is required' , 'data'=>''],400);
+            }
+
+
+
+            $validator = Validator::make($request->all(),[
+                'edition' => 'required',
+            ]);
+            if($validator->fails()){
+            return response()->json(['status' => 'error' , 'message'=>'edition is required' , 'data'=>''],400);
+            }
+
+            $book = Book::where('id', $request->book_id)->first();
+            if($book == null)
+            {
+                return response()->json(['status' => 'error' , 'message'=>'book not found' , 'data'=>''],400);
+            }
+
+            $auth_user = auth()->guard('sanctum')->user();// get logged in user details from auth data
+            $user_id = $auth_user->id;
+
+
+
+
+            //check if author own this book
+            $check = Bookauthor::where(['user_id'=>$user_id, 'book_id'=>$request->book_id])->first();
+            if($check == NULL)
+            {
+              return response()->json(['status' => 'error' , 'message'=>'You do not have the permission to edit this book' , 'data'=>''],400);
+            }
+
+
+            $book->title = $request->title;
+            $book->edition = $request->edition;
+            $book->description = $request->description;
+            $book->prologue = $request->prologue;
+            $book->save();
+            return response()->json(['status'=>'success', 'message'=>"book updated successfully",  'data' =>$book],200);
+      }
+
+
+
+
+          //update the status of a  book
+      public function updatebookstatus(Request $request)
+      {
+
+                $validator = Validator::make($request->all(),[
+                    'id' => 'required',
+                ]);
+                if($validator->fails()){
+                return response()->json(['status' => 'error' , 'message'=>'id is required' , 'data'=>''],400);
+                }
+
+                $validator = Validator::make($request->all(),[
+                    'status' => 'required',
+                ]);
+                if($validator->fails()){
+                return response()->json(['status' => 'error' , 'message'=>'status is required' , 'data'=>''],400);
+                }
+
+
+                $auth_user = auth()->guard('sanctum')->user();// get logged in user details from auth data
+                $user_id = $auth_user->id;
+
+
+                //check if author own this book
+                $check = Bookauthor::where(['user_id'=>$user_id, 'book_id'=>$request->id])->first();
+                if($check == NULL)
+                {
+                  return response()->json(['status' => 'error' , 'message'=>'You do not have the permission to edit this book' , 'data'=>''],400);
+                }
+
+
+                $values_of_status =  array("available", "borrowed");
+
+                $book =  Book::where('id',$request->id)->first();
+                $book->status = $request->status;
+                $book->save();
+
+                if($book == null){ return response()->json(['status' => 'error' , 'message'=>'book not found' , 'data'=>''],400); }
+                return response()->json(['status'=>'success', 'message'=>"book updated successfully",  'data' =>$book],200);
+      }
+
+
 }
