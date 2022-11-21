@@ -43,5 +43,7 @@ Route::middleware('auth:sanctum')->group( function () {
   Route::get('view_inactive_subscriptions', [UserController::class,  'view_inactive_subscriptions']);
   Route::post('borrow_book', [UserController::class,  'borrow_book']);
   Route::post('return_book', [UserController::class,  'return_book']);
+  Route::get('view_borrowed_books', [UserController::class,  'view_borrowed_books']);
+  Route::get('view_returned_books', [UserController::class,  'view_returned_books']);
 
 });

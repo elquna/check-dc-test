@@ -141,12 +141,21 @@ class UserController extends Controller
             $auth_user = auth()->guard('sanctum')->user();// get logged in user details from auth data
             $user_id = $auth_user->id;
 
+            //first check if book exist and is available
+            $checkbook = Book::where(['book_id'=>$request->book_id, 'status'=>'available'])->first();
+            if($checkbook == NULL)
+            {
+              return response()->json(['status' => 'error' , 'message'=>'book is not available' , 'data'=>''],400);
+            }
+
             //get user active subscription , anc check whether the user has subscribed for a plans that the book has
             $activesub = Usersubscriptionplan::where(['user_id'=>$user_id, 'status'=>'active'])->first();
             if($activesub == NULL)
             {
                 return response()->json(['status'=>'error', 'message'=>'you dont have an active Subscription plan',  'data' =>''],400);
             }
+
+
 
 
 
@@ -240,6 +249,31 @@ class UserController extends Controller
 
         return response()->json(['status'=>'success', 'message'=>"book returned successfully",  'data' =>$lending],200);
 
+      }
+
+      public function view_returned_books()
+      {
+        $auth_user = auth()->guard('sanctum')->user();// get logged in user details from auth data
+        $user_id = $auth_user->id;
+        $lending =  Lending::where(['user_id' => $user_id, 'status'=>'inactive'])->get();
+        foreach ($lending as $onelend)
+        {
+           $onelend->book = Book::where('id',$onelend->book_id)->first();
+        }
+        return response()->json(['status'=>'success', 'message'=>"returned books fetched successfully",  'data' =>$lending],200);
+      }
+
+
+      public function view_borrowed_books()
+      {
+        $auth_user = auth()->guard('sanctum')->user();// get logged in user details from auth data
+        $user_id = $auth_user->id;
+        $lending =  Lending::where(['user_id' => $user_id, 'status'=>'active'])->get();
+        foreach ($lending as $onelend)
+        {
+           $onelend->book = Book::where('id',$onelend->book_id)->first();
+        }
+        return response()->json(['status'=>'success', 'message'=>"borrowed books fetched successfully",  'data' =>$lending],200);
       }
 
 
