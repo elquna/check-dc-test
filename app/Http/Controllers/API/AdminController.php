@@ -17,6 +17,20 @@ use Validator;
 class AdminController extends Controller
 {
 
+     public function __construct()
+     {
+       $auth_user = auth()->guard('sanctum')->user();// get logged in user details from auth data
+       $user_id = $auth_user->id;
+
+       //check if user is admin
+       $userrole =  Userrole::where(['user_id'=>$user_id, 'role_id'=>1])->first();
+       if($userrole == NULL)
+       {
+          echo json_encode(array('status'=>'error', 'message'=>"this is an admin action",  'data' =>''));
+          die;
+       }
+
+     }
 
     //fetches all users
     public function viewusers()
