@@ -18,7 +18,7 @@ class CreateBooksTable extends Migration
             $table->timestamps();
             $table->string('title');
             $table->string('edition');
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->string('prologue')->nullable();
             $table->integer('access_level')->default(0);
             $table->string('status')->default('available')->comment('available, active, inactive, borrowed');
