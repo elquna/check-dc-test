@@ -20,6 +20,11 @@ class AdminController extends Controller
      public function __construct()
      {
        $auth_user = auth()->guard('sanctum')->user();// get logged in user details from auth data
+       if(!$auth_user)
+       {
+         return response()->json(['status'=>'error', 'message'=>"user not found",  'data' =>''],400);
+         die;
+       }
        $user_id = $auth_user->id;
 
        //check if user is admin
@@ -361,6 +366,103 @@ class AdminController extends Controller
       $bs->save();
       return response()->json(['status'=>'success', 'message'=>"subscription plan assigned to book successfully",  'data' =>$bs],200);
 
+    }
+
+
+    public function create_subscription_plan(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'name' => 'required|unique:subscriptionplans',
+        ]);
+        if($validator->fails()){
+        return response()->json(['status' => 'error' , 'message'=>'name is required and must be unique' , 'data'=>''],400);
+        }
+
+        $validator = Validator::make($request->all(),[
+            'price' => 'required|numeric',
+        ]);
+        if($validator->fails()){
+        return response()->json(['status' => 'error' , 'message'=>'price is required' , 'data'=>''],400);
+        }
+
+
+        $validator = Validator::make($request->all(),[
+            'duration' => 'required|integer',
+        ]);
+        if($validator->fails()){
+        return response()->json(['status' => 'error' , 'message'=>'duration is required' , 'data'=>''],400);
+        }
+
+        $added_at =   new \DateTime("Africa/Lagos");
+        $formatted_added_at = $added_at->format("Y-m-d");
+
+        $subscriptionplan = new Subscriptionplan();
+        $subscriptionplan->name = $request->name;
+        $subscriptionplan->price = $request->price;
+        $subscriptionplan->duration = $request->duration;
+        $subscriptionplan->added_at = $formatted_added_at;
+        $subscriptionplan->save();
+        return response()->json(['status'=>'success', 'message'=>"subscriptionplan added successfully",  'data' =>$subscriptionplan],200);
+    }
+
+    public function update_subscription_plan(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'id' => 'required|numeric',
+        ]);
+        if($validator->fails()){
+        return response()->json(['status' => 'error' , 'message'=>'id  is required' , 'data'=>''],400);
+        }
+
+        $validator = Validator::make($request->all(),[
+            'name' => 'required',
+        ]);
+        if($validator->fails()){
+        return response()->json(['status' => 'error' , 'message'=>'name is required and must be unique' , 'data'=>''],400);
+        }
+
+        $validator = Validator::make($request->all(),[
+            'price' => 'required|numeric',
+        ]);
+        if($validator->fails()){
+        return response()->json(['status' => 'error' , 'message'=>'price is required' , 'data'=>''],400);
+        }
+
+
+        $validator = Validator::make($request->all(),[
+            'duration' => 'required|integer',
+        ]);
+        if($validator->fails()){
+        return response()->json(['status' => 'error' , 'message'=>'duration is required' , 'data'=>''],400);
+        }
+
+        $added_at =   new \DateTime("Africa/Lagos");
+        $formatted_added_at = $added_at->format("Y-m-d");
+
+        $subscriptionplan = Subscriptionplan::where('id',$request->id)->first();
+        $subscriptionplan->name = $request->name;
+        $subscriptionplan->price = $request->price;
+        $subscriptionplan->duration = $request->duration;
+        $subscriptionplan->added_at = $formatted_added_at;
+        $subscriptionplan->save();
+        return response()->json(['status'=>'success', 'message'=>"subscriptionplan added successfully",  'data' =>$subscriptionplan],200);
+    }
+
+
+    public function view_subscription_plans()
+    {
+      $sb = Subscriptionplan::orderby('id', 'desc')->get();
+      return response()->json(['status'=>'success', 'message'=>"subscriptionplans fetched successfully",  'data' =>$sb],200);
+    }
+
+    public function view_subscription_plan_by_id($id)
+    {
+      $sub = Subscriptionplan::where('id', $id)->first();
+      if($sub == NULL)
+      {
+        return response()->json(['status' => 'error' , 'message'=>'subscription plan not found' , 'data'=>''],400);
+      }
+      return response()->json(['status'=>'success', 'message'=>"subscription plan fetched successfully",  'data' =>$sub],200);
     }
 
 

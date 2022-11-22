@@ -28,6 +28,13 @@ Route::middleware('auth:sanctum')->group( function () {
   Route::post('updateuser', [AdminController::class, 'updateuser']);
   Route::post('updateuserstatus', [AdminController::class, 'updateuserstatus']);
 
+  //admin routes  manage subscription plans
+  Route::post('create_subscription_plan', [AdminController::class, 'create_subscription_plan']);
+  Route::post('update_subscription_plan', [AdminController::class, 'update_subscription_plan']);
+  Route::get('view_subscription_plans', [AdminController::class, 'view_subscription_plans']);
+  Route::get('view_subscription_plan_by_id/{id}', [AdminController::class, 'view_subscription_plan_by_id']);
+
+
   //admin routes  manage books
   Route::post('createbook', [AdminController::class, 'createbook']);
   Route::post('updatebook', [AdminController::class, 'updatebook']);
